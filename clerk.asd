@@ -9,10 +9,11 @@
   :author       "Petko Tsikov <tsikov@gmail.com>"
   :serial       t
   :license      "MIT"
-  :depends-on   (#:bordeaux-threads)
+  :depends-on   (#:bordeaux-threads #:cl-ppcre)
   :components   ((:module "src"
                           :components
-                          ((:file "clerk"))))
+                          ((:file "time")
+                           (:file "clerk"))))
   :in-order-to ((test-op (test-op clerk-test))))
 
 (defsystem #:clerk-test
@@ -24,6 +25,7 @@
   :serial t
   :components ((:module "t"
                         :components
-                        ((:test-file "clerk"))))
+                        ((:test-file "clerk")
+                         (:test-file "time"))))
   :perform (test-op :after (op c)
                     (funcall (intern #.(string :run) :prove) c)))

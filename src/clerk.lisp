@@ -14,7 +14,7 @@
 (defclass event ()
   ((name :initarg :name)
    (interval :initarg :interval)
-   (fire-time :initarg :fire-time)
+   (fire-time :initarg :fire-time :reader fire-time)
    (body :initarg :body)))
 
 (defclass continuous-event (event) ())
@@ -47,9 +47,7 @@
 (defun add-to-event-queue (name type interval body)
   (let ((event (make-event name type interval body)))
     (push event *events*)
-    ;; sort events by fire-time
-    (sort *events* #'< :key #'(lambda (e)
-                                (slot-value e 'fire-time)))))
+    (sort *events* #'< :key #'fire-time)))
      
 (defun empty-events-queue ()
   (setf *events* nil))

@@ -15,17 +15,29 @@
         "Can make continuous event"
         :test #'string=)
     (is (type-of (clerk::make-event "Friendly event"
-                                    'on
-                                    'monday
+                                    'in
+                                    '1.day
                                     '(print "Hi!")))
         'one-time-event
         "Can make one-time event"
         :test #'string=))
 
     (subtest "macro (event ..."
-      (clerk:event "Cool event" every friday (print "Party!"))
+      (clerk:event "Cool event" every 5.days (print "Party!"))
       (is (length clerk:*events*)
           1
-          "Adds an event to the events queue.")))
-  
+          "Adds an event to the events queue.")
+
+      (clerk:empty-events-queue)
+      (clerk:event "First event to fire"
+                   in 1.minute (print "Fire!"))
+      (clerk:event "Second event to fire"
+                   in 2.minutes (print "Fire!"))
+      (with-slots (clerk::name) (first clerk:*events*)
+        (is clerk::name "First event to fire"
+            "Orders events by time of firing."
+            :test #'string=))
+      ;; clear the event queue again for future tests
+      (clerk:empty-events-queue)))
+
 (finalize)

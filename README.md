@@ -8,9 +8,7 @@ A cron-like scheduler with sane DSL
 (event "Say 'Hi' all the time" every 5.seconds (print "Hi"))
 
 (event "Compose and send monthly report"
-       every 1.month (progn
-                       (send-report
-                         (compose-monthly-report))))
+       every 1.month (send-report (compose-monthly-report)))
 ```
 
 ## Instalation and usage

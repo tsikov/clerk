@@ -48,14 +48,15 @@
                    :body body)))
 
 (defmacro event (name type interval body)
-  `(add-to-event-queue ,name ',type ',interval ',body))
+  `(add-to-event-queue ,name ',type ',interval
+                       (lambda () ,body)))
 
-(defun add-to-event-queue (name type interval body)
-  (let ((event (make-event name type interval body)))
+(defun add-to-event-queue (name type interval fn)
+  (let ((event (make-event name type interval fn)))
     (push event *events*)
     (sort *events* #'< :key #'fire-time)
     event))
-     
+
 (defun empty-events-queue ()
   (setf *events* nil))
 
@@ -66,11 +67,9 @@
   "Check if it is time to fire an event"
   (<= (fire-time event) (get-universal-time)))
 
-(defmacro add-to-fired-events (name body)
-  ;; TODO: EVAL IS ONLY TEMPORARY!!!
-  `(push (bt:make-thread #'(lambda () (eval ,body))
-                         :name ,name)
-         *fired-events*))
+(defun add-to-fired-events (name fn)
+  (push (bt:make-thread fn :name name)
+        *fired-events*))
 
 (defmethod fire-event ((event event))
   (with-slots (name body) event

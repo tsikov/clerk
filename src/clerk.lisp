@@ -5,7 +5,8 @@
            #:empty-events-queue
            #:event
            #:start
-           #:stop))
+           #:stop
+           #:calendar))
 (in-package #:clerk)
 
 ;; TODO:
@@ -104,3 +105,14 @@ events."
   "Stop scheduler."
   (bt:destroy-thread *main-thread*)
   (setf *main-thread* nil))
+
+(defun calendar (&optional (stream *standard-output*))
+  "Print pending and fired events"
+  (format stream "PENDING EVENTS:~%")
+  (loop for event in *events*
+     do (with-slots (name interval fire-time) event
+            (format stream "~A - ~A - ~A~%" name interval fire-time)))
+  (format stream "FIRED EVENTS:~%")
+  (loop for thread in *fired-events*
+     do (format stream "~A~%" (bt:thread-name thread))))
+

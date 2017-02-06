@@ -10,11 +10,10 @@
 (in-package #:clerk)
 
 ;; TODO:
-;; display calendar
 ;; rename event -> job
 
-(defparameter *events* nil)
-(defparameter *fired-events* nil)
+(defparameter *events* nil
+  "All scheduled events")
 (defparameter *main-thread* nil)
 
 (defclass event ()
@@ -28,8 +27,7 @@
 
 (defmethod initialize-instance :after ((event event) &key)
   (let ((fire-time (clerk.time:timejump (get-universal-time)
-                                        (slot-value event 'interval))))
-    
+                                        (slot-value event 'interval))))    
     (setf (slot-value event 'fire-time)
           fire-time)))
 
@@ -60,20 +58,12 @@
 (defun empty-events-queue ()
   (setf *events* nil))
 
-(defun empty-fired-events-list ()
-  (setf *fired-events* nil))
-
 (defun fire-event-p (event)
   "Check if it is time to fire an event"
   (<= (fire-time event) (get-universal-time)))
 
-(defun add-to-fired-events (name fn)
-  (push (bt:make-thread fn :name name)
-        *fired-events*))
-
 (defmethod fire-event ((event event))
-  (with-slots (name body) event
-    (add-to-fired-events name body)))
+  (bt:make-thread (body event) :name (name event)))
 
 (defmethod fire-event :before ((event continuous-event))
   "Create the next event in the event queue when firing continuous
@@ -101,7 +91,7 @@ events."
          :name "Main scheduler thread.")))
 
 (defun stop ()
-  "Stop scheduler."
+  "Stop scheduler"
   (bt:destroy-thread *main-thread*)
   (setf *main-thread* nil))
 
@@ -110,8 +100,5 @@ events."
   (format stream "PENDING EVENTS:~%")
   (loop for event in *events*
      do (with-slots (name interval fire-time) event
-            (format stream "~A - ~A - ~A~%" name interval fire-time)))
-  (format stream "FIRED EVENTS:~%")
-  (loop for thread in *fired-events*
-     do (format stream "~A~%" (bt:thread-name thread))))
+            (format stream "~A - ~A - ~A~%" name interval fire-time))))
 

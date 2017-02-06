@@ -52,24 +52,20 @@
         "Event is fired when the time comes"))
 
   (clerk:empty-events-queue)
-    (clerk::empty-fired-events-list)
-    (subtest "defmethod (fire-event"
-      (clerk::fire-event
-       (clerk:event "One-time event" in 1.second (+ 1 2)))
-      (is (bt:join-thread (car clerk::*fired-events*))
+  (subtest "defmethod (fire-event"
+    (let ((event-thread (clerk::fire-event
+                         (clerk:event "One-time event" in 1.second (+ 1 2)))))
+      (is (bt:join-thread event-thread)
           3
-          "The event's calculation is performed successfully")
-      (is (length clerk::*fired-events*) 1
-          "The fired events queue has the fired event in it")
-      (is (length clerk:*events*) 1
-          "One-time events don't create a new event in the event queue
+          "The event's calculation is performed successfully"))
+    (is (length clerk:*events*) 1
+        "One-time events don't create a new event in the event queue
 when they are fired.")
-      (clerk:empty-events-queue)
-      (clerk::empty-fired-events-list)
-      (clerk::fire-event
-       (clerk:event "Continuous event" every 1.second (+ 1 2)))
-      (is (length clerk:*events*) 2
-          "Continuous events create a new event in the event queue when
+    (clerk:empty-events-queue)
+    (clerk::fire-event
+     (clerk:event "Continuous event" every 1.second (+ 1 2)))
+    (is (length clerk:*events*) 2
+        "Continuous events create a new event in the event queue when
 when they are fired")))
 
 (finalize)

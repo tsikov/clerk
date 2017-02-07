@@ -18,7 +18,16 @@
                               (hour . 360)
                               (hours . 360)
                               (day . 8640)
-                              (days . 8640))
+                              (days . 8640)
+                              (week . 60480)
+                              (weeks . 60480)
+                              (month . 241920)
+                              (months . 241920)
+                              ;; years are (* days 365)
+                              ;; regardless if the current year is
+                              ;; a leap year
+                              (year . 3153600)
+                              (years . 3153600))
               :test #'string=)))
 
 (defun interval->seconds (interval)

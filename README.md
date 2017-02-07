@@ -51,6 +51,16 @@ Clone the repo inside `quicklisp/local-projects` and do `(ql:quicklisp :clerk)` 
 
 Make sure your jobs are loaded before executing `(clerk:start)`. The jobs reside inside `clerk:*jobs*`, but you can also type `(clerk:calendar)` to see a list of all scheduled and running jobs. 
 
+## Intervals
+
+Right now (more are coming soon) there is one type of interval in the form of:
+
+```
+[number].[interval-type]
+```
+
+where the number is a positive integer and the `interval-type` if one of the following: `second`, `minute`, `hour`, `day`, `week`, `month`, `year`. Also you can use the plural form of all these words. For example `1.second` and `2.seconds` are both valid.
+
 ## Issues / Contribution
 
 If you have issues - open a github issue or contact me at `(reverse "moc.liamg@vokist")`. If you want to contribute - open an issue or make a PR. Thanks!

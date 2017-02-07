@@ -51,6 +51,18 @@ Clone the repo inside `quicklisp/local-projects` and do `(ql:quicklisp :clerk)` 
 
 Make sure your jobs are loaded before executing `(clerk:start)`. The jobs reside inside `clerk:*jobs*`, but you can also type `(clerk:calendar)` to see a list of all scheduled and running jobs. 
 
+## Job types
+
+There are two types of jobs - `continuous` and `one-time`. If a job has the keyword `every` after the job description - the job will be countinuous. This means that when an event is fired, a new event will be pushed in the event queue for firing exactly `interval` time from now. The jobs above are an example for `continuous` jobs.
+
+A `one-time` job is fired once and then it is removed from the jobs' queue. An example for a one-time job can be:
+
+```
+(job "Extraordinary event" in 5.days (send-mail "Don't forget X"))
+```
+
+You can use any word instead of `in`.
+
 ## Intervals
 
 Right now (more are coming soon) there is one type of interval in the form of:

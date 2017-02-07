@@ -1,34 +1,31 @@
 (in-package #:cl-user)
 (defpackage #:clerk
   (:use #:cl)
-  (:export #:*events*
-           #:empty-events-queue
-           #:event
+  (:export #:*jobs*
+           #:empty-jobs-queue
+           #:job
            #:start
            #:stop
            #:calendar))
 (in-package #:clerk)
 
-;; TODO:
-;; rename event -> job
-
-(defparameter *events* nil
-  "All scheduled events")
+(defparameter *jobs* nil
+  "All scheduled jobs")
 (defparameter *main-thread* nil)
 
-(defclass event ()
+(defclass job ()
   ((name :initarg :name :reader name)
    (interval :initarg :interval)
    (fire-time :initarg :fire-time :reader fire-time)
    (body :initarg :body :reader body)))
 
-(defclass continuous-event (event) ())
-(defclass one-time-event (event) ())
+(defclass continuous-job (job) ())
+(defclass one-time-job (job) ())
 
-(defmethod initialize-instance :after ((event event) &key)
+(defmethod initialize-instance :after ((job job) &key)
   (let ((fire-time (clerk.time:timejump (get-universal-time)
-                                        (slot-value event 'interval))))    
-    (setf (slot-value event 'fire-time)
+                                        (slot-value job 'interval))))    
+    (setf (slot-value job 'fire-time)
           fire-time)))
 
 (defun continuous-p (type)
@@ -36,57 +33,57 @@
   ;; string= will do package agnostic symbol comparison
   (string= type 'every))
 
-(defun make-event (name type interval body)
-  (let ((event-class (if (continuous-p type)
-                         'continuous-event
-                         'one-time-event)))
-    (make-instance event-class
+(defun make-job (name type interval body)
+  (let ((job-class (if (continuous-p type)
+                       'continuous-job
+                       'one-time-job)))
+    (make-instance job-class
                    :name name
                    :interval interval
                    :body body)))
 
-(defmacro event (name type interval body)
-  `(add-to-event-queue ,name ',type ',interval
+(defmacro job (name type interval body)
+  `(add-to-jobs-queue ,name ',type ',interval
                        (lambda () ,body)))
 
-(defun add-to-event-queue (name type interval fn)
-  (let ((event (make-event name type interval fn)))
-    (push event *events*)
-    (sort *events* #'< :key #'fire-time)
-    event))
+(defun add-to-jobs-queue (name type interval fn)
+  (let ((job (make-job name type interval fn)))
+    (push job *jobs*)
+    (sort *jobs* #'< :key #'fire-time)
+    job))
 
-(defun empty-events-queue ()
-  (setf *events* nil))
+(defun empty-jobs-queue ()
+  (setf *jobs* nil))
 
-(defun fire-event-p (event)
-  "Check if it is time to fire an event"
-  (<= (fire-time event) (get-universal-time)))
+(defun fire-job-p (job)
+  "Check if it is time to fire an job"
+  (<= (fire-time job) (get-universal-time)))
 
-(defmethod fire-event ((event event))
-  (bt:make-thread (body event) :name (name event)))
+(defmethod fire-job ((job job))
+  (bt:make-thread (body job) :name (name job)))
 
-(defmethod fire-event :before ((event continuous-event))
-  "Create the next event in the event queue when firing continuous
-events."
-  (with-slots (name interval body) event
-    (add-to-event-queue name 'every interval body)))
+(defmethod fire-job :before ((job continuous-job))
+  "Create the next job in the job queue when firing continuous
+jobs."
+  (with-slots (name interval body) job
+    (add-to-jobs-queue name 'every interval body)))
 
-(defun fire-event-if-needed ()
-  (if (fire-event-p (car *events*))
+(defun fire-job-if-needed ()
+  (if (fire-job-p (car *jobs*))
       (progn
-        (fire-event (pop *events*))
-        ;; just in case the second event in queue is the same
+        (fire-job (pop *jobs*))
+        ;; just in case the second job in queue is the same
         ;; second as the first one. Or there might be a lot of
-        ;; events in the queue.
-        (fire-event-if-needed))))
+        ;; jobs in the queue.
+        (fire-job-if-needed))))
 
 (defun start ()
-  "Start the thread that waits for an event to fire."
+  "Start the thread that waits for an jobs to fire."
   (setf *main-thread*
         (bt:make-thread
          #'(lambda ()
              (loop
-                (fire-event-if-needed)
+                (fire-job-if-needed)
                 (sleep 1)))
          :name "Main scheduler thread.")))
 
@@ -96,9 +93,9 @@ events."
   (setf *main-thread* nil))
 
 (defun calendar (&optional (stream *standard-output*))
-  "Print pending and fired events"
-  (format stream "PENDING EVENTS:~%")
-  (loop for event in *events*
-     do (with-slots (name interval fire-time) event
-            (format stream "~A - ~A - ~A~%" name interval fire-time))))
+  "Print pending and fired jobs"
+  (format stream "PENDING JOBS:~%")
+  (loop for job in *jobs*
+     do (with-slots (name interval fire-time) job
+          (format stream "~A - ~A - ~A~%" name interval fire-time))))
 

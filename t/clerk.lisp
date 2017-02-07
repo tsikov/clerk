@@ -6,66 +6,66 @@
 (plan 1)
 
 (subtest "package clerk.test"
-  (subtest "function (make-event"
-    (is (type-of (clerk::make-event "Friendly event"
+  (subtest "function (make-job"
+    (is (type-of (clerk::make-job "Friendly job"
                                     'every
                                     '5.minutes
                                     '(print "Hi!")))
-        'continuous-event
-        "Can make continuous event"
+        'continuous-job
+        "Can make continuous job"
         :test #'string=)
-    (is (type-of (clerk::make-event "Friendly event"
+    (is (type-of (clerk::make-job "Friendly job"
                                     'in
                                     '1.day
                                     '(print "Hi!")))
-        'one-time-event
-        "Can make one-time event"
+        'one-time-job
+        "Can make one-time job"
         :test #'string=))
 
-  (clerk:empty-events-queue)
-  (subtest "macro (event ..."
-    (clerk:event "Cool event" every 5.days (print "Party!"))
-    (is (length clerk:*events*)
+  (clerk:empty-jobs-queue)
+  (subtest "macro (job ..."
+    (clerk:job "Cool job" every 5.days (print "Party!"))
+    (is (length clerk:*jobs*)
         1
-        "Adds an event to the events queue.")
+        "Adds an job to the jobs queue.")
     
-    (clerk:empty-events-queue)
-    (clerk:event "First event to fire"
+    (clerk:empty-jobs-queue)
+    (clerk:job "First job to fire"
                  in 1.minute (print "Fire!"))
-    (clerk:event "Second event to fire"
+    (clerk:job "Second job to fire"
                  in 2.minutes (print "Fire!"))
-    (with-slots (clerk::name) (first clerk:*events*)
-      (is clerk::name "First event to fire"
-          "Orders events by time of firing."
+    (with-slots (clerk::name) (first clerk:*jobs*)
+      (is clerk::name "First job to fire"
+          "Orders jobs by time of firing."
           :test #'string=))
-    ;; clear the event queue again for future tests
-    (clerk:empty-events-queue))
+    ;; clear the job queue again for future tests
+    (clerk:empty-jobs-queue))
   
-  (subtest "function (fire-event-p"
-    (ok (not (clerk::fire-event-p
-              (make-instance 'clerk:event
+  (subtest "function (fire-job-p"
+    (ok (not (clerk::fire-job-p
+              (make-instance 'clerk:job
                              :interval '1.minute)))
-        "Event is not fired before it's time")
-    (ok (clerk::fire-event-p
-         (make-instance 'clerk:event
+        "Job is not fired before it's time")
+    (ok (clerk::fire-job-p
+         (make-instance 'clerk:job
                         :interval '-1.second))
-        "Event is fired when the time comes"))
+        "Job is fired when the time comes"))
 
-  (clerk:empty-events-queue)
-  (subtest "defmethod (fire-event"
-    (let ((event-thread (clerk::fire-event
-                         (clerk:event "One-time event" in 1.second (+ 1 2)))))
-      (is (bt:join-thread event-thread)
+  (clerk:empty-jobs-queue)
+  (subtest "defmethod (fire-job"
+    (let ((job-thread (clerk::fire-job
+                         (clerk:job "One-time job" in 1.second (+ 1 2)))))
+      (is (bt:join-thread job-thread)
           3
-          "The event's calculation is performed successfully"))
-    (is (length clerk:*events*) 1
-        "One-time events don't create a new event in the event queue
+          "The job's calculation is performed successfully"))
+    (is (length clerk:*jobs*) 1
+        "One-time jobs don't create a new job in the job queue
 when they are fired.")
-    (clerk:empty-events-queue)
-    (clerk::fire-event
-     (clerk:event "Continuous event" every 1.second (+ 1 2)))
-    (is (length clerk:*events*) 2
-        "Continuous events create a new event in the event queue when
+    (clerk:empty-jobs-queue)
+    (clerk::fire-job
+     (clerk:job "Continuous job" every 1.second (+ 1 2)))
+    (is (length clerk:*jobs*) 2
+        "Continuous jobs create a new job in the job queue when
 when they are fired")))
 
 (finalize)

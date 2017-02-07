@@ -2,13 +2,13 @@
 
 A cron-like scheduler with sane DSL
 
-## Example events
+## Example usage
 
 ```
-(event "Say 'Hi' all the time" every 5.seconds (print "Hi"))
+(job "Say 'Hi' all the time" every 5.seconds (print "Hi"))
 
-(event "Compose and send monthly report"
-       every 1.month (send-report (compose-monthly-report)))
+(job "Compose and send monthly report"
+     every 1.month (send-report (compose-monthly-report)))
 ```
 
 If you want to see it with your eyes, make sure to load the following code:
@@ -21,9 +21,9 @@ If you want to see it with your eyes, make sure to load the following code:
                        :if-does-not-exist :create)
     (format log "~A~%" msg)))
 
-(event "Print farbe" every 3.seconds (write-to-file "Farbe" "log.txt"))
-(event "Print colour" every 2.seconds (write-to-file "Colour" "log.txt"))
-(event "Print @@@@ 1 min @@@@@" every 1.minute
+(job "Print farbe" every 3.seconds (write-to-file "Farbe" "log.txt"))
+(job "Print colour" every 2.seconds (write-to-file "Colour" "log.txt"))
+(job "Print @@@@ 1 min @@@@@" every 1.minute
        (write-to-file "@@@@@@ 1 min @@@@@@" "log.txt"))
 ```
 Now, after `(clerk:start)`, tailing `log.txt` should give you something like this:
@@ -49,7 +49,7 @@ Colour
 
 Clone the repo inside `quicklisp/local-projects` and do `(ql:quicklisp :clerk)` in your REPL.
 
-Make sure your events are loaded before executing `(clerk:start)`. The events reside inside `clerk:*events*`, but you can also type `(clerk:calendar)` to see a list of all scheduled and running events. 
+Make sure your jobs are loaded before executing `(clerk:start)`. The jobs reside inside `clerk:*jobs*`, but you can also type `(clerk:calendar)` to see a list of all scheduled and running jobs. 
 
 ## Issues / Contribution
 

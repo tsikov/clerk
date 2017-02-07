@@ -15,8 +15,8 @@
 
 (defclass job ()
   ((name :initarg :name :reader name)
-   (interval :initarg :interval)
-   (fire-time :initarg :fire-time :reader fire-time)
+   (interval :initarg :interval :reader interval)
+   (fire-time :initarg :fire-time :accessor fire-time)
    (body :initarg :body :reader body)))
 
 (defclass continuous-job (job) ())
@@ -24,8 +24,8 @@
 
 (defmethod initialize-instance :after ((job job) &key)
   (let ((fire-time (clerk.time:timejump (get-universal-time)
-                                        (slot-value job 'interval))))    
-    (setf (slot-value job 'fire-time)
+                                        (interval job))))    
+    (setf (fire-time job)
           fire-time)))
 
 (defun continuous-p (type)
@@ -56,7 +56,7 @@
   (setf *jobs* nil))
 
 (defun fire-job-p (job)
-  "Check if it is time to fire an job"
+  "Check if it is time to fire a job"
   (<= (fire-time job) (get-universal-time)))
 
 (defmethod fire-job ((job job))
@@ -78,7 +78,7 @@ jobs."
         (fire-job-if-needed))))
 
 (defun start ()
-  "Start the thread that waits for an jobs to fire."
+  "Start the thread that waits for a jobs to fire."
   (setf *main-thread*
         (bt:make-thread
          #'(lambda ()
@@ -93,8 +93,8 @@ jobs."
   (setf *main-thread* nil))
 
 (defun calendar (&optional (stream *standard-output*))
-  "Print pending and fired jobs"
-  (format stream "PENDING JOBS:~%")
+  "Print the scheduled jobs"
+  (format stream "JOBS:~%")
   (loop for job in *jobs*
      do (with-slots (name interval fire-time) job
           (format stream "~A - ~A - ~A~%" name interval fire-time))))

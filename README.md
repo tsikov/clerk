@@ -40,7 +40,7 @@ Colour
 Colour
 Farbe
 Colour
-/some time later.../
+/one minute later.../
 @@@@@@ 1 min @@@@@@
 /etc.../
 ```

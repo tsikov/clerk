@@ -31,16 +31,31 @@
     
     (clerk:empty-jobs-queue)
     (clerk:job "First job to fire"
-                 in 1.minute (print "Fire!"))
+               in 1.minute (print "Fire!"))
     (clerk:job "Second job to fire"
-                 in 2.minutes (print "Fire!"))
+               in 2.minutes (print "Fire!"))
     (with-slots (clerk::name) (first clerk:*jobs*)
       (is clerk::name "First job to fire"
           "Orders jobs by time of firing."
+          :test #'string=)))
+
+  (subtest "function (job-fn"
+    (clerk:empty-jobs-queue)
+    (clerk:job-fn "Test job-fn" 'every '1.minute #'(lambda () (print "Fire!")))
+    (with-slots (clerk::name) (first clerk:*jobs*)
+      (is clerk::name "Test job-fn"
+          "Adds the job to the job queue."
           :test #'string=))
-    ;; clear the job queue again for future tests
-    (clerk:empty-jobs-queue))
+    (clerk:job-fn "Test job-fn (interval as a list)"
+                  'in
+                  (list 5 'seconds)
+                  #'(lambda () (print "Fire!")))
+    (with-slots (clerk::name) (first clerk:*jobs*)
+      (is clerk::name "Test job-fn (interval as a list)"
+          "Adds the job to the job queue. Can decipher interval as a list"
+          :test #'string=)))
   
+  (clerk:empty-jobs-queue)
   (subtest "function (fire-job-p"
     (ok (not (clerk::fire-job-p
               (make-instance 'clerk:job

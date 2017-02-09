@@ -22,6 +22,9 @@
   (is (clerk.time::interval->seconds '1.hour)
       360
       "Can convert numbered interval to seconds")
+  (is (clerk.time::interval->seconds (list 1 'minute))
+      60
+      "Can convert a numbered interval presented as a list to seconds")
 
   (ok (typep (clerk.time::interval->seconds 'friday) 'number)
       "Days of the week return the remaining seconds until this time")

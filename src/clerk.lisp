@@ -4,6 +4,7 @@
   (:export #:*jobs*
            #:empty-jobs-queue
            #:job
+           #:job-fn
            #:start
            #:stop
            #:calendar))
@@ -45,6 +46,9 @@
 (defmacro job (name type interval body)
   `(add-to-jobs-queue ,name ',type ',interval
                        (lambda () ,body)))
+
+(defun job-fn (name type interval fn)
+  (add-to-jobs-queue name type interval fn))
 
 (defun add-to-jobs-queue (name type interval fn)
   (let ((job (make-job name type interval fn)))

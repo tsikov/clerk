@@ -4,6 +4,8 @@ A cron-like scheduler with sane DSL
 
 ## Example usage
 
+### Job MACRO
+
 ```
 (job "Say 'Hi' all the time" every 5.seconds (print "Hi"))
 
@@ -44,6 +46,20 @@ Colour
 @@@@@@ 1 min @@@@@@
 /etc.../
 ```
+
+### Job FUNCTION
+
+The original idea was for users to use the library to execute some sort of execution of a configuration file. However you can use the job creation process programatically with the underlying function `job-fn`. E.g.:
+
+```
+(defparameter *query-interval* 5)
+(job-fn (format nil "Query the API every ~A seconds" *query-interval*)
+        'every
+        `(,*query-interval* seconds)
+        #'query-api-fn)
+```
+
+As you can see, you have to provide a function (either anonimous function or a function symbol) as the last argument.
 
 ## Instalation and usage
 

@@ -64,13 +64,22 @@ day of the week."
      (* 86400
         (1- (days-to-add (current-day-of-the-week) (day-as-number day-of-the-week))))))
 
-(defun interval->seconds (interval)
-  (cond ((day-of-the-week-p interval)
-         (seconds-to-day-of-the-week interval))
-        (t (multiple-value-bind (n interval-type)
-               (split-interval interval)
-             (* n
-                (interval-type->seconds interval-type))))))
+(defun interval-as-list-p (interval)
+  "Check if an interval is given as a list"
+  (consp interval))
 
+(defun interval-as-list (interval)
+  (* (car interval) (interval-type->seconds (cadr interval))))
+
+(defun interval->seconds (interval)
+  (if (interval-as-list-p interval)
+      (interval-as-list interval)
+      (cond ((day-of-the-week-p interval)
+             (seconds-to-day-of-the-week interval))
+            (t (multiple-value-bind (n interval-type)
+                   (split-interval interval)
+                 (* n
+                    (interval-type->seconds interval-type)))))))
+  
 (defun timejump (start-time interval)
   (+ start-time (interval->seconds interval)))

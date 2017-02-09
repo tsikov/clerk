@@ -20,6 +20,9 @@
   (is (clerk.time::interval->seconds '1.hour)
       360)
 
+  (ok (typep (clerk.time::interval->seconds 'friday) 'number)
+      "Days of the week return the remaining seconds until this time")
+
   (is (clerk.time:timejump 0 '1.minute)
       60))
 

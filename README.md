@@ -51,7 +51,7 @@ Clone the repo inside `quicklisp/local-projects` and do `(ql:quicklisp :clerk)` 
 
 Make sure your jobs are loaded before executing `(clerk:start)`. The jobs reside inside `clerk:*jobs*`, but you can also type `(clerk:calendar)` to see a list of all scheduled and running jobs. 
 
-## Job types
+### Job types
 
 There are two types of jobs - `continuous` and `one-time`. If a job has the keyword `every` after the job description - the job will be countinuous. This means that when an event is fired, a new event will be pushed in the event queue for firing exactly `interval` time from now. The jobs above are an example for `continuous` jobs.
 
@@ -63,15 +63,25 @@ A `one-time` job is fired once and then it is removed from the jobs' queue. An e
 
 You can use any word instead of `in`.
 
-## Intervals
+### Intervals
 
-Right now (more are coming soon) there is one type of interval in the form of:
+Right now (more are coming soon) there are 2 type of intervals:
+
+1) **Numbered intervals**
 
 ```
 [number].[interval-type]
 ```
 
 where the number is a positive integer and the `interval-type` if one of the following: `second`, `minute`, `hour`, `day`, `week`, `month`, `year`. Also you can use the plural form of all these words. For example `1.second` and `2.seconds` are both valid.
+
+2) **Days of the week**
+
+```
+(job "Weekly report" every monday (create-report))
+```
+
+Pretty self-explanatory. The idea is that if you type the day of the week, clerk will calculate when it is and add an event to the queue.
 
 ## Issues / Contribution
 

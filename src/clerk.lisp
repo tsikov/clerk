@@ -73,7 +73,7 @@ jobs."
     (add-to-jobs-queue name 'every interval body)))
 
 (defun fire-job-if-needed ()
-  (if (fire-job-p (car *jobs*))
+  (when (and *jobs* (fire-job-p (car *jobs*)))
       (progn
         (fire-job (pop *jobs*))
         ;; just in case the second job in queue is the same

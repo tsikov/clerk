@@ -59,9 +59,9 @@ The original idea was for users to use the library to execute some sort of execu
         #'query-api-fn)
 ```
 
-As you can see, you have to provide a function (either anonimous function or a function symbol) as the last argument.
+As you can see, you have to provide a function (either anonymous function or a function symbol) as the last argument.
 
-## Instalation and usage
+## Installation and usage
 
 Clone the repo inside `quicklisp/local-projects` and do `(ql:quicklisp :clerk)` in your REPL.
 
@@ -69,9 +69,9 @@ Make sure your jobs are loaded before executing `(clerk:start)`. The jobs reside
 
 ### Job types
 
-There are two types of jobs - `continuous` and `one-time`. If a job has the keyword `every` after the job description - the job will be countinuous. This means that when an event is fired, a new event will be pushed in the event queue for firing exactly `interval` time from now. The jobs above are an example for `continuous` jobs.
+There are two types of jobs - `continuous` and `one-time`. If a job has the keyword `every` after the job description - the job will be continuous. This means that when an event is fired, a new event will be pushed in the event queue for firing exactly `interval` time from now. The jobs above are an example of `continuous` jobs.
 
-A `one-time` job is fired once and then it is removed from the jobs' queue. An example for a one-time job can be:
+A `one-time` job is fired once and then it is removed from the jobs queue. An example of a one-time job can be:
 
 ```
 (job "Extraordinary event" in 5.days (send-mail "Don't forget X"))
@@ -99,6 +99,8 @@ where the number is a positive integer and the `interval-type` if one of the fol
 
 Pretty self-explanatory. The idea is that if you type the day of the week, clerk will calculate when it is and add an event to the queue.
 
-## Issues / Contribution
+## Maintenance
 
-If you have issues - open a github issue or contact me at `(reverse "moc.liamg@vokist")`. If you want to contribute - open an issue or make a PR. Thanks!
+Clerk was written by Petko Tsikov
+
+It is currently maintained by Ben McGunigle (bnmcgn at gmail dot com)

@@ -73,13 +73,12 @@ jobs."
     (add-to-jobs-queue name 'every interval body)))
 
 (defun fire-job-if-needed ()
-  (if (and *jobs* (fire-job-p (car *jobs*)))
-      (progn
-        (fire-job (pop *jobs*))
-        ;; just in case the second job in queue is the same
-        ;; second as the first one. Or there might be a lot of
-        ;; jobs in the queue.
-        (fire-job-if-needed))))
+  (when (and *jobs* (fire-job-p (car *jobs*)))
+    (fire-job (pop *jobs*))
+    ;; just in case the second job in queue is the same
+    ;; second as the first one. Or there might be a lot of
+    ;; jobs in the queue.
+    (fire-job-if-needed)))
 
 (defun start ()
   "Start the thread that waits for a jobs to fire."
@@ -89,7 +88,7 @@ jobs."
              (loop
                 (fire-job-if-needed)
                 (sleep 1)))
-         :name "Main scheduler thread.")))
+         :name "Clerk scheduler thread")))
 
 (defun stop ()
   "Stop scheduler"

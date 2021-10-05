@@ -2,6 +2,8 @@
 
 A cron-like scheduler with sane DSL
 
+**Maintained fork is at [https://github.com/lisp-maintainers/clerk](https://github.com/lisp-maintainers/clerk)**
+
 ## Example usage
 
 ### Job MACRO
